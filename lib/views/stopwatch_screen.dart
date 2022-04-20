@@ -46,8 +46,19 @@ class StopwatchScreen extends StatelessWidget {
                 children: [
                   ElevatedButton(
                     onPressed: stopwatch.start
-                        ? stopwatch.pauseTimer
-                        : stopwatch.startTimer,
+                        ? () {
+                            stopwatch
+                                .pauseTimer(stopwatch.stopwatch.inMilliseconds);
+                          }
+                        :
+                        //here it will play after max_ping/2 + ping/2 (called the function in stopwtch_screen.dart)
+                        //meaning it will play after time taken for the message to go to the farthest user
+                        //the json however will only have max_ping/2 as argument and the receiving user will play after max_ping/2 - their ping (called the function in Stopwatch.commandsHandler())
+                        () {
+                            stopwatch.startTimer(
+                                (stopwatch.ping / 2 + stopwatch.max_ping / 2)
+                                    .toInt());
+                          },
                     child: Text(stopwatch.start ? "pause" : "start"),
                   ),
                   const SizedBox(
