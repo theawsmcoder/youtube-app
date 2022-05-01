@@ -4,38 +4,72 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'dart:async';
 import 'dart:convert';
 
-class YoutubeWebview extends StatelessWidget {
-  bool playerReady = false;
+class YoutubeWebviewTest extends StatelessWidget {
+  late bool playerReady;
   final Completer<WebViewController> _completer =
       Completer<WebViewController>();
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.width * 9 / 16,
-      child: WebView(
-        javascriptMode: JavascriptMode.unrestricted,
-        initialUrl: "about:blank",
-        allowsInlineMediaPlayback: true,
-        initialMediaPlaybackPolicy: AutoMediaPlaybackPolicy.always_allow,
-        onWebViewCreated: (webViewController) {
-          webViewController.loadUrl(
-            Uri.dataFromString(
-              _player(),
-              encoding: Encoding.getByName("utf-8"),
-              mimeType: "text/html",
-            ).toString(),
-          );
-          _completer.complete(webViewController);
-        },
-        onPageFinished: (url) {
-          playerReady = true;
-        },
-        javascriptChannels: <JavascriptChannel>{
-          JavascriptChannel(
-              name: 'Player', onMessageReceived: onMessageReceived)
-        },
+    var width = MediaQuery.of(context).size.width;
+    var height = MediaQuery.of(context).size.width * 16 / 9;
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("test"),
+      ),
+      body: Container(
+        child: Column(
+          children: [
+            Container(
+              width: double.infinity,
+              height: MediaQuery.of(context).size.width * 9 / 16,
+              child: WebView(
+                javascriptMode: JavascriptMode.unrestricted,
+                initialUrl: "about:blank",
+                allowsInlineMediaPlayback: true,
+                initialMediaPlaybackPolicy:
+                    AutoMediaPlaybackPolicy.always_allow,
+                onWebViewCreated: (webViewController) {
+                  webViewController.loadUrl(
+                    Uri.dataFromString(
+                      _player(
+                        height: width,
+                        width: height,
+                      ),
+                      encoding: Encoding.getByName("utf-8"),
+                      mimeType: "text/html",
+                    ).toString(),
+                  );
+                  _completer.complete(webViewController);
+                },
+                onPageFinished: (url) {
+                  playerReady = true;
+                },
+                javascriptChannels: <JavascriptChannel>{
+                  JavascriptChannel(
+                      name: 'Player', onMessageReceived: onMessageReceived)
+                },
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    callJavascriptMethod('playVideo()');
+                  },
+                  child: const Text('play'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    callJavascriptMethod('pauseVideo()');
+                  },
+                  child: const Text('pause'),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -47,7 +81,7 @@ class YoutubeWebview extends StatelessWidget {
         .runJavascriptReturningResult('Player.postMessage($func);'));
   }
 
-  String _player() => '''
+  String _player({double? height, double? width}) => '''
     <!DOCTYPE html>
     <html>
       <body>
@@ -67,8 +101,8 @@ class YoutubeWebview extends StatelessWidget {
           var player;
           function onYouTubeIframeAPIReady() {
             player = new YT.Player('player', {
-              //height: '100%',
-              width: '100%',
+              height: '$height',
+              width: '$width',
               videoId: 'M7lc1UVf-VE',
               playerVars: {
                 'controls': 0,
@@ -88,7 +122,7 @@ class YoutubeWebview extends StatelessWidget {
 
           // 4. The API will call this function when the video player is ready.
           function onPlayerReady(event) {
-            //event.target.playVideo();
+            event.target.playVideo();
             //player.addEventListener('onStateChange', onPlayerStateChange);
           }
 

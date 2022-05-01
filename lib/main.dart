@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sample/controllers/youtube_connector.dart';
+import 'package:sample/views/youtube_screen.dart';
 import './controllers/stopwatch.dart';
 import './views/stopwatch_screen.dart';
 import './counter.dart';
+import './views/youtube_webview_test.dart';
 
 void main() {
   runApp(MyApp());
@@ -26,9 +29,10 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: ChangeNotifierProvider<Stopwatch>(
-        create: (context) => Stopwatch(),
-        child: StopwatchScreen(),
+      home: //YoutubeWebviewTest()
+          ChangeNotifierProvider<YoutubeController>(
+        create: (context) => YoutubeController(),
+        child: const YoutubeScreen(),
       ),
 
       /*home: ChangeNotifierProvider<Counter>(
