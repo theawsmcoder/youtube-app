@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sample/views/youtube_webview.dart';
+import 'player_layout.dart';
+import 'youtube_webview.dart';
 import '.././controllers/youtube_connector.dart';
 
 class YoutubeScreen extends StatelessWidget {
@@ -9,9 +10,10 @@ class YoutubeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    YoutubeWebview youtubeWebview = YoutubeWebview();
     final youtubeController =
         Provider.of<YoutubeController>(context, listen: false);
+    YoutubeWebview youtubeWebview =
+        YoutubeWebview(youtubeController: youtubeController);
     youtubeController.setFunction(youtubeWebview.callJavascriptMethod);
 
     var appBar = AppBar(
@@ -27,30 +29,28 @@ class YoutubeScreen extends StatelessWidget {
       appBar: appBar,
       body: Container(
         width: mediaQuery.size.width,
-        height: mediaQuery.size.height,
+        height: mediaQuery.size.width * 9 / 16 + 215,
         child: Column(
           children: [
             youtubeWebview,
-            Consumer<YoutubeController>(
-              builder: (context, value, child) => ElevatedButton(
-                onPressed: youtubeController.start
-                    ? () {
-                        //print(youtubeController.start);
-                        youtubeController.pauseVideo();
-                      }
-                    : () {
-                        //print(youtubeController.start);
-                        var delay = (youtubeController.ping / 2 +
-                                youtubeController.ping / 2)
-                            .toInt();
-                        youtubeController.playVideo(delay);
-                      },
-                child: youtubeController.start
-                    ? const Text("pause")
-                    : const Text("play"),
-              ),
+            Stack(
+              children: [
+                Container(
+                  color: Colors.cyan,
+                  height: mediaQuery.size.width * 9 / 16,
+                  width: mediaQuery.size.width,
+                ),
+                Consumer<YoutubeController>(
+                  builder: (context, value, child) =>
+                      youtubeController.params.title == 'not-ready'
+                          ? const SizedBox()
+                          : PlayerLayout(
+                              playerInfo: youtubeController.params,
+                            ),
+                ),
+              ],
             ),
-            Consumer<YoutubeController>(
+            /* Consumer<YoutubeController>(
               builder: (context, value, child) => TextButton(
                 onPressed: youtubeController.isConnected
                     ? youtubeController.disconnect
@@ -59,7 +59,7 @@ class YoutubeScreen extends StatelessWidget {
                     ? const Text("disconnect")
                     : const Text("connect"),
               ),
-            ),
+            ),*/
           ],
         ),
       ),

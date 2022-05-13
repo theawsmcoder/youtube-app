@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:sample/controllers/youtube_connector.dart';
+import 'package:sample/models/player_info.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import 'dart:async';
@@ -8,12 +10,16 @@ class YoutubeWebview extends StatelessWidget {
   bool playerReady = false;
   final Completer<WebViewController> _completer =
       Completer<WebViewController>();
+  late YoutubeController youtubeController;
+
+  YoutubeWebview({required this.youtubeController});
 
   @override
   Widget build(BuildContext context) {
+    //print(MediaQuery.of(context).size.width);
     return Container(
       width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.width * 9 / 16,
+      height: MediaQuery.of(context).size.width * 9 / 16 - 1,
       child: WebView(
         javascriptMode: JavascriptMode.unrestricted,
         initialUrl: "about:blank",
@@ -40,7 +46,14 @@ class YoutubeWebview extends StatelessWidget {
     );
   }
 
-  void onMessageReceived(JavascriptMessage message) {}
+  void onMessageReceived(JavascriptMessage message) {
+    try {
+      PlayerInfo pi = PlayerInfo.fromJson(message.message);
+      youtubeController.setParams(pi);
+    } catch (e) {
+      print("Exception in internal Json communication:" + e.toString());
+    }
+  }
 
   void callJavascriptMethod(String func) {
     _completer.future.then((webViewController) => webViewController
@@ -50,7 +63,7 @@ class YoutubeWebview extends StatelessWidget {
   String _player() => '''
     <!DOCTYPE html>
     <html>
-      <body>
+      <body style="margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px;">
         <!-- 1. The <iframe> (and video player) will replace this <div> tag. -->
         <div id="player"></div>
 
@@ -67,8 +80,8 @@ class YoutubeWebview extends StatelessWidget {
           var player;
           function onYouTubeIframeAPIReady() {
             player = new YT.Player('player', {
-              //height: '100%',
-              width: '100%',
+              height: '608',
+              width: '1080',
               videoId: 'M7lc1UVf-VE',
               playerVars: {
                 'controls': 0,
@@ -79,7 +92,7 @@ class YoutubeWebview extends StatelessWidget {
               
               events: {
                 'onReady': onPlayerReady,
-                //'onStateChange': onPlayerStateChange,
+                'onStateChange': onPlayerStateChange,
               }
             });
           }
@@ -88,8 +101,11 @@ class YoutubeWebview extends StatelessWidget {
 
           // 4. The API will call this function when the video player is ready.
           function onPlayerReady(event) {
-            //event.target.playVideo();
-            //player.addEventListener('onStateChange', onPlayerStateChange);
+            var title = player.getVideoData()['title'];
+            var duration = player.getDuration();
+            var playerState = player.getPlayerState();
+            var currentTime = player.getCurrentTime();
+            Player.postMessage('{"title":"' + title + '", "duration": "' + duration + '", "playerState": "' + playerState + '", "currentTime": "' + currentTime + '"}');
           }
 
           // 5. The API calls this function when the player's state changes.
@@ -97,15 +113,12 @@ class YoutubeWebview extends StatelessWidget {
           //    the player should play for six seconds and then stop.
           var done = false;
           function onPlayerStateChange(event) {
-            /*if (event.data == YT.PlayerState.PLAYING && !done) {
-              setTimeout(stopVideo, 6000);
-              done = true;
-            }*/
-            //just testing 
-            if(event.data == YT.PlayerState.PAUSED){
-                player.loadVideoById('bHQqvYy5KYo');
-                done = true;
-            } 
+            var title = player.getVideoData()['title'];
+            var duration = player.getDuration();
+            var playerState = player.getPlayerState();
+            var currentTime = player.getCurrentTime();
+            Player.postMessage('{"title":"' + title + '", "duration": "' + duration + '", "playerState": "' + playerState + '", "currentTime": "' + currentTime + '"}');
+          
 
           }
           
@@ -120,6 +133,21 @@ class YoutubeWebview extends StatelessWidget {
           function stopVideo(){
             player.stopVideo();
           } 
+
+	        function seekTo(seconds){
+	          player.seekTo(seconds, true);
+	          player.pauseVideo();
+	        }
+
+          function getTitle(){
+            var title = player.getVideoData()['title'];
+            Player.postMessage(title);
+          }
+
+          function getTotalDuration(){
+            var totalDuration = player.getDuration();
+            Player.postMessage(totalDuration);
+          }
         </script>
       </body>
     </html>

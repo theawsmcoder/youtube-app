@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'dart:async';
 
 import 'package:sample/controllers/connection_manager.dart';
+import 'package:sample/models/player_info.dart';
 import '.././models/command.dart';
 import '.././models/commands.dart';
 
@@ -15,6 +16,8 @@ class YoutubeController with ChangeNotifier {
   bool isConnected = false;
   late Command1 command;
   late Function? func;
+  PlayerInfo params = PlayerInfo(
+      title: 'not-ready', currentTime: 0.0, duration: 0.0, playerState: 0);
 
   YoutubeController() {
     Commands.username = "OnePlus Nord";
@@ -38,15 +41,6 @@ class YoutubeController with ChangeNotifier {
     });
     notifyListeners();
   }
-
-  /*void pauseVideo(int pausedAt) {
-    start = false;
-    if (!remoteEvent && isConnected) {
-      conn.send(Commands.pause(pausedAt.toString()).toString());
-    }
-    // a function to pause
-    notifyListeners();
-  }*/
 
   void pauseVideo() {
     start = false;
@@ -79,6 +73,18 @@ class YoutubeController with ChangeNotifier {
     pingTimer!.cancel();
   }
 
+  void seekTo(double seconds) {
+    func!("seekTo($seconds)");
+  }
+
+  double getDuration() {
+    return params.duration;
+  }
+
+  String getTitle() {
+    return params.title;
+  }
+
   void updatePing(int ping, int max_ping) {
     this.ping = ping;
     this.max_ping = max_ping;
@@ -87,6 +93,11 @@ class YoutubeController with ChangeNotifier {
 
   void changeConnectedStatus(bool status) {
     isConnected = status;
+    notifyListeners();
+  }
+
+  void setParams(PlayerInfo pi) {
+    params = pi;
     notifyListeners();
   }
 
