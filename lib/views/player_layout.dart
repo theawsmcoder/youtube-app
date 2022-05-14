@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import 'dart:async';
+
 import './../models/player_info.dart';
 import './../controllers/youtube_connector.dart';
 
@@ -13,10 +16,13 @@ class PlayerLayout extends StatefulWidget {
 class _PlayerLayoutState extends State<PlayerLayout> {
   double tempValue = 0.0;
   bool layoutVisible = true;
+  Timer? sliderTimer;
+
   @override
   Widget build(BuildContext context) {
     final youtubeController =
         Provider.of<YoutubeController>(context, listen: false);
+
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -59,12 +65,14 @@ class _PlayerLayoutState extends State<PlayerLayout> {
                         onPressed: youtubeController.start
                             ? () {
                                 youtubeController.pauseVideo();
+                                sliderPause();
                               }
                             : () {
                                 var delay = (youtubeController.ping / 2 +
                                         youtubeController.ping / 2)
                                     .toInt();
                                 youtubeController.playVideo(delay);
+                                sliderStart();
                               },
                         icon: Icon(
                           youtubeController.start
@@ -109,6 +117,7 @@ class _PlayerLayoutState extends State<PlayerLayout> {
                                     tempValue = value;
                                   });
                                   youtubeController.seekTo(value);
+                                  sliderPause();
                                 },
                               ),
                             ),
@@ -129,6 +138,23 @@ class _PlayerLayoutState extends State<PlayerLayout> {
             : const SizedBox.expand(),
       ),
     );
+  }
+
+  void sliderStart() {
+    sliderTimer?.cancel();
+    if (sliderTimer == null || !sliderTimer!.isActive) {
+      sliderTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        if (tempValue <= widget.playerInfo.duration) {
+          setState(() {
+            tempValue += 1;
+          });
+        }
+      });
+    }
+  }
+
+  void sliderPause() {
+    sliderTimer?.cancel();
   }
 
   String timeFormat(int time) {

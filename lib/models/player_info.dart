@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+/// this class is used to convert json received from webview. the json received is for internal communications
+
 class PlayerInfo {
   String title;
   double currentTime = 0.0;

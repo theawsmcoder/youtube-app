@@ -75,6 +75,8 @@ class YoutubeController with ChangeNotifier {
 
   void seekTo(double seconds) {
     func!("seekTo($seconds)");
+    start = false;
+    notifyListeners();
   }
 
   double getDuration() {

@@ -46,6 +46,7 @@ class YoutubeWebview extends StatelessWidget {
     );
   }
 
+  // updates PlayerLayout as per the json received
   void onMessageReceived(JavascriptMessage message) {
     try {
       PlayerInfo pi = PlayerInfo.fromJson(message.message);
@@ -100,26 +101,25 @@ class YoutubeWebview extends StatelessWidget {
           
 
           // 4. The API will call this function when the video player is ready.
+          // here the Player.postMessage() sends message to app. onMessage() listens and updates state as per the json sent to the app
           function onPlayerReady(event) {
-            var title = player.getVideoData()['title'];
-            var duration = player.getDuration();
-            var playerState = player.getPlayerState();
-            var currentTime = player.getCurrentTime();
-            Player.postMessage('{"title":"' + title + '", "duration": "' + duration + '", "playerState": "' + playerState + '", "currentTime": "' + currentTime + '"}');
-          }
+            sendPlayerInfo();
+            }
 
           // 5. The API calls this function when the player's state changes.
           //    The function indicates that when playing a video (state=1),
           //    the player should play for six seconds and then stop.
-          var done = false;
+
           function onPlayerStateChange(event) {
+            sendPlayerInfo();
+          }
+
+          function sendPlayerInfo(){
             var title = player.getVideoData()['title'];
             var duration = player.getDuration();
             var playerState = player.getPlayerState();
             var currentTime = player.getCurrentTime();
             Player.postMessage('{"title":"' + title + '", "duration": "' + duration + '", "playerState": "' + playerState + '", "currentTime": "' + currentTime + '"}');
-          
-
           }
           
           function pauseVideo(){
