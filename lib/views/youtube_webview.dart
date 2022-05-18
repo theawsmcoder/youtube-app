@@ -104,7 +104,7 @@ class YoutubeWebview extends StatelessWidget {
           // here the Player.postMessage() sends message to app. onMessage() listens and updates state as per the json sent to the app
           function onPlayerReady(event) {
             sendPlayerInfo();
-            }
+          }
 
           // 5. The API calls this function when the player's state changes.
           //    The function indicates that when playing a video (state=1),

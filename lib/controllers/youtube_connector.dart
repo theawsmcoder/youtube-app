@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'dart:async';
 
-import 'package:sample/controllers/connection_manager.dart';
-import 'package:sample/models/player_info.dart';
+import 'connection_manager.dart';
+import '.././models/player_info.dart';
 import '.././models/command.dart';
 import '.././models/commands.dart';
 
@@ -16,11 +16,11 @@ class YoutubeController with ChangeNotifier {
   bool isConnected = false;
   late Command1 command;
   late Function? func;
-  PlayerInfo params = PlayerInfo(
+  PlayerInfo playerInfo = PlayerInfo(
       title: 'not-ready', currentTime: 0.0, duration: 0.0, playerState: 0);
 
   YoutubeController() {
-    Commands.username = "OnePlus Nord";
+    Commands.username = "OnePlus 9";
   }
 
   void setFunction(Function func) {
@@ -51,6 +51,15 @@ class YoutubeController with ChangeNotifier {
     notifyListeners();
   }
 
+  void seekTo(double seconds) {
+    if (!remoteEvent && isConnected) {
+      conn.send(Commands.seekTo(seconds.toString()).toString());
+    }
+    func!("seekTo($seconds)");
+    start = false;
+    notifyListeners();
+  }
+
   void stopVideo() {
     start = false;
     if (!remoteEvent && isConnected) {
@@ -73,18 +82,12 @@ class YoutubeController with ChangeNotifier {
     pingTimer!.cancel();
   }
 
-  void seekTo(double seconds) {
-    func!("seekTo($seconds)");
-    start = false;
-    notifyListeners();
-  }
-
   double getDuration() {
-    return params.duration;
+    return playerInfo.duration;
   }
 
   String getTitle() {
-    return params.title;
+    return playerInfo.title;
   }
 
   void updatePing(int ping, int max_ping) {
@@ -99,7 +102,7 @@ class YoutubeController with ChangeNotifier {
   }
 
   void setParams(PlayerInfo pi) {
-    params = pi;
+    playerInfo = pi;
     notifyListeners();
   }
 
@@ -131,6 +134,9 @@ class YoutubeController with ChangeNotifier {
         //var pausedAt = Duration(milliseconds: int.parse(command.args!));
         //pauseVideo(pausedAt.inMilliseconds);
         pauseVideo();
+      } else if (command.func == "seekTo") {
+        var pauseAt = double.parse(command.args!);
+        seekTo(pauseAt);
       } else if (command.func == "stop") {
         stopVideo();
       } else if (command.func == "ping") {

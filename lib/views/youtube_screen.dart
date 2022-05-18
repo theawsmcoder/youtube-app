@@ -29,7 +29,7 @@ class YoutubeScreen extends StatelessWidget {
       appBar: appBar,
       body: Container(
         width: mediaQuery.size.width,
-        height: mediaQuery.size.width * 9 / 16 + 215,
+        height: mediaQuery.size.width * 9 / 16 + 215 + 48,
         child: Column(
           children: [
             youtubeWebview,
@@ -42,15 +42,13 @@ class YoutubeScreen extends StatelessWidget {
                 ),
                 Consumer<YoutubeController>(
                   builder: (context, value, child) =>
-                      youtubeController.params.title == 'not-ready'
+                      youtubeController.playerInfo.title == 'not-ready'
                           ? const SizedBox()
-                          : PlayerLayout(
-                              playerInfo: youtubeController.params,
-                            ),
+                          : PlayerLayout(),
                 ),
               ],
             ),
-            /* Consumer<YoutubeController>(
+            Consumer<YoutubeController>(
               builder: (context, value, child) => TextButton(
                 onPressed: youtubeController.isConnected
                     ? youtubeController.disconnect
@@ -59,7 +57,7 @@ class YoutubeScreen extends StatelessWidget {
                     ? const Text("disconnect")
                     : const Text("connect"),
               ),
-            ),*/
+            ),
           ],
         ),
       ),
