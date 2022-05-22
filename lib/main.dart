@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sample/controllers/chat_connector.dart';
 import 'package:sample/controllers/youtube_connector.dart';
-import 'package:sample/views/chat_screen_test.dart';
+import 'package:sample/views/chat_widget.dart';
 import 'package:sample/views/youtube_screen.dart';
 import './controllers/stopwatch.dart';
 import './views/stopwatch_screen.dart';
@@ -33,8 +33,8 @@ class MyApp extends StatelessWidget {
       ),
       home: //YoutubeWebviewTest()
           ChangeNotifierProvider<ChatController>(
-        create: (context) => ChatController(),
-        child: ChatScreen(),
+        create: (context) => ChatController(username: "Alice"),
+        child: ChatWidget(),
       ),
 
       /*home: ChangeNotifierProvider<Counter>(

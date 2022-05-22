@@ -7,9 +7,26 @@ import '.././models/chat_message.dart';
 class ChatController with ChangeNotifier {
   late ConnectionManager conn;
   bool isConnected = false;
-  late ChatMessage message;
-  List<ChatMessage> chats = [];
-  final username = "OnePlus Nord";
+  List<ChatMessage> chats = [
+    ChatMessage(
+      username: "Alice",
+      message: "Bonjour! Je m'appelle Alice.",
+      time: DateTime.utc(1969, 7, 20, 20, 12, 02),
+    ),
+    ChatMessage(
+      username: "Bob",
+      message: "Enchante, Alice.",
+      time: DateTime.utc(1999, 7, 20, 20, 12, 02),
+    ),
+    ChatMessage(
+      username: "Alice",
+      message: "Shut up!",
+      time: DateTime.utc(2000, 7, 20, 20, 12, 02),
+    ),
+  ];
+  final username;
+
+  ChatController({required this.username});
 
   void changeConnectedStatus(bool status) {
     isConnected = status;
@@ -17,11 +34,17 @@ class ChatController with ChangeNotifier {
   }
 
   void sendMessage(ChatMessage message) {
-    conn.send(message.toString());
+    if (conn.isConnected()) {
+      conn.send(message.toString());
+    }
     updateChatList(message);
   }
 
   void updateChatList(ChatMessage message) {
+    // maintains chats max length at 256 messages
+    if (chats.length > 256) {
+      chats.remove(chats[0]);
+    }
     chats.add(message);
     notifyListeners();
   }
@@ -41,7 +64,7 @@ class ChatController with ChangeNotifier {
 
   void commandsHandler(String json) {
     try {
-      message = ChatMessage.fromJson(json);
+      ChatMessage message = ChatMessage.fromJson(json);
       if (message.func == 'chat') {
         updateChatList(message);
       }

@@ -19,8 +19,8 @@ class YoutubeController with ChangeNotifier {
   PlayerInfo playerInfo = PlayerInfo(
       title: 'not-ready', currentTime: 0.0, duration: 0.0, playerState: 0);
 
-  YoutubeController() {
-    Commands.username = "OnePlus 9";
+  YoutubeController({required String username}) {
+    Commands.username = username;
   }
 
   void setFunction(Function func) {
