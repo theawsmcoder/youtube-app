@@ -101,8 +101,9 @@ class YoutubeController with ChangeNotifier {
     notifyListeners();
   }
 
-  void setParams(PlayerInfo pi) {
+  void updatePlayerInfo(PlayerInfo pi) {
     playerInfo = pi;
+    print(pi);
     notifyListeners();
   }
 
@@ -131,8 +132,6 @@ class YoutubeController with ChangeNotifier {
           playVideo(delay.toInt());
         }
       } else if (command.func == "pause") {
-        //var pausedAt = Duration(milliseconds: int.parse(command.args!));
-        //pauseVideo(pausedAt.inMilliseconds);
         pauseVideo();
       } else if (command.func == "seekTo") {
         var pauseAt = double.parse(command.args!);

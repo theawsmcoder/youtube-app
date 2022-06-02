@@ -61,23 +61,57 @@ class _PlayerLayoutState extends State<PlayerLayout> {
                       ),
                       Center(
                         child: IconButton(
-                          onPressed: youtubeController.start
-                              ? () {
-                                  youtubeController.seekTo(tempValue);
-                                  sliderPause();
-                                }
-                              : () {
-                                  var delay = (youtubeController.ping / 2 +
-                                          youtubeController.ping / 2)
-                                      .toInt();
-                                  youtubeController.playVideo(delay);
+                          onPressed: () {
+                            switch (youtubeController.playerInfo.playerState) {
+                              //ended
+                              // for now im using same code as play here
+                              case 0:
+                                var delay = (youtubeController.ping / 2 +
+                                        youtubeController.ping / 2)
+                                    .toInt();
+                                youtubeController.playVideo(delay);
 
-                                  sliderStart();
-                                },
+                                sliderStart();
+                                break;
+
+                              //pause
+                              case 1:
+                                youtubeController.seekTo(tempValue);
+                                sliderPause();
+                                break;
+
+                              //play
+                              case 2:
+                                var delay = (youtubeController.ping / 2 +
+                                        youtubeController.ping / 2)
+                                    .toInt();
+                                youtubeController.playVideo(delay);
+
+                                sliderStart();
+                                break;
+
+                              //buffering
+                              // for now im using same code as pause here
+                              case 3:
+                                youtubeController.seekTo(tempValue);
+                                sliderPause();
+                                break;
+
+                              //cued
+                              // same code as play
+                              case 5:
+                                var delay = (youtubeController.ping / 2 +
+                                        youtubeController.ping / 2)
+                                    .toInt();
+                                youtubeController.playVideo(delay);
+
+                                sliderStart();
+                                break;
+                            }
+                          },
                           icon: Icon(
-                            youtubeController.start
-                                ? Icons.pause
-                                : Icons.play_arrow,
+                            (getIcon(
+                                youtubeController.playerInfo.playerState!)),
                             size: 30,
                             color: Colors.white,
                           ),
@@ -152,6 +186,23 @@ class _PlayerLayoutState extends State<PlayerLayout> {
           });
         }
       });
+    }
+  }
+
+  IconData getIcon(int playerState) {
+    switch (playerState) {
+      case 0:
+        return Icons.play_arrow;
+      case 1:
+        return Icons.pause;
+      case 2:
+        return Icons.play_arrow;
+      case 3:
+        return Icons.pause;
+      case 5:
+        return Icons.play_arrow;
+      default:
+        return Icons.dangerous;
     }
   }
 

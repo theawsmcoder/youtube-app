@@ -50,7 +50,7 @@ class YoutubeWebview extends StatelessWidget {
   void onMessageReceived(JavascriptMessage message) {
     try {
       PlayerInfo pi = PlayerInfo.fromJson(message.message);
-      youtubeController.setParams(pi);
+      youtubeController.updatePlayerInfo(pi);
     } catch (e) {
       print("Exception in internal Json communication:" + e.toString());
     }
