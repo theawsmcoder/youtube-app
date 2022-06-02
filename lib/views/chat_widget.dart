@@ -40,10 +40,10 @@ class ChatWidget extends StatelessWidget {
             Text(message.username,
                 textAlign: TextAlign.left,
                 style:
-                    const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                    const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
             Text(message.message,
                 textAlign: TextAlign.left,
-                style: const TextStyle(fontSize: 16)),
+                style: const TextStyle(fontSize: 14)),
             Text(dateFormat.format(message.time),
                 textAlign: TextAlign.right,
                 style: const TextStyle(fontSize: 10)),
@@ -55,67 +55,71 @@ class ChatWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var mediaQuery = MediaQuery.of(context);
-
     ChatController chatController =
         Provider.of<ChatController>(context, listen: false);
 
     return Consumer<ChatController>(
-      builder: (context, value, child) => Column(
-        children: [
-          Expanded(
+      builder: (context, value, child) => Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
               child: SingleChildScrollView(
-            child: Column(
-              children: chatController.chats
-                  .map((chat) => _buildMessage(chat, context) as Widget)
-                  .toList(),
-            ),
-          )),
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  autofocus: true,
-                  controller: controller,
+                reverse: true,
+                child: Column(
+                  children: chatController.chats
+                      .map((chat) => _buildMessage(chat, context) as Widget)
+                      .toList(),
                 ),
               ),
-              IconButton(
-                  onPressed: () {
-                    var temp = ChatMessage(
-                      username: chatController.username,
-                      message: controller.text,
-                      time: DateTime.now(),
-                    );
-                    chatController.sendMessage(temp);
-                    controller.clear();
-                  },
-                  icon: const Icon(
-                    Icons.send,
-                  ))
-            ],
-          ),
-          TextButton(
-            onPressed: chatController.isConnected
-                ? chatController.disconnect
-                : chatController.connectAndListen,
-            child: chatController.isConnected
-                ? const Text("disconnect")
-                : const Text("connect"),
-          ),
-        ],
+            ),
+            Row(
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextField(
+                      autofocus: false,
+                      controller: controller,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        hintText: "type...",
+                      ),
+                      style: const TextStyle(
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ),
+                IconButton(
+                    onPressed: () {
+                      var temp = ChatMessage(
+                        username: chatController.username,
+                        message: controller.text,
+                        time: DateTime.now(),
+                      );
+                      chatController.sendMessage(temp);
+                      controller.clear();
+                    },
+                    icon: const Icon(
+                      Icons.send,
+                    ))
+              ],
+            ),
+            /*TextButton(
+              onPressed: chatController.isConnected
+                  ? chatController.disconnect
+                  : chatController.connectAndListen,
+              child: chatController.isConnected
+                  ? const Text("disconnect")
+                  : const Text("connect"),
+            ),*/
+          ],
+        ),
       ),
     );
   }
-
-  /*_messageFormatter(String messageContent) {
-    int splitLength = 38;
-    int i = 0;
-    String temp = "";
-    while (i < messageContent.length) {
-      temp +=
-          "${messageContent.substring(i, min(i + splitLength, messageContent.length))}\n";
-      i += splitLength;
-    }
-    return temp.substring(0, temp.length - 1);
-  }*/
 }

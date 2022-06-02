@@ -109,7 +109,7 @@ class YoutubeController with ChangeNotifier {
   void connectAndListen() {
     conn = ConnectionManager(
         uri:
-            "ws://fastapi-backend-test1.herokuapp.com/ws/${Commands.username}");
+            "ws://fastapi-backend-test2.herokuapp.com/ws/${Commands.username}");
     conn.connect();
     if (conn.isConnected()) {
       changeConnectedStatus(true);
