@@ -189,6 +189,21 @@ class _PlayerLayoutState extends State<PlayerLayout> {
     }
   }
 
+  void sliderPause() {
+    sliderTimer?.cancel();
+  }
+
+  String timeFormat(int time) {
+    var duration = Duration(seconds: time);
+    var formatted = duration.toString();
+    List<int> list =
+        formatted.split(':').map((e) => double.parse(e).round()).toList();
+    if (list[0] == 0) {
+      return "${list[1].toString().padLeft(2, '0')}:${list[2].round().toString().padLeft(2, '0')}";
+    }
+    return "${list[0].toString().padLeft(2, '0')}:${list[1].toString().padLeft(2, '0')}:${list[2].round().toString().padLeft(2, '0')}";
+  }
+
   IconData getIcon(int playerState) {
     switch (playerState) {
       case 0:
@@ -204,20 +219,5 @@ class _PlayerLayoutState extends State<PlayerLayout> {
       default:
         return Icons.dangerous;
     }
-  }
-
-  void sliderPause() {
-    sliderTimer?.cancel();
-  }
-
-  String timeFormat(int time) {
-    var duration = Duration(seconds: time);
-    var formatted = duration.toString();
-    List<int> list =
-        formatted.split(':').map((e) => double.parse(e).round()).toList();
-    if (list[0] == 0) {
-      return "${list[1].toString().padLeft(2, '0')}:${list[2].round().toString().padLeft(2, '0')}";
-    }
-    return "${list[0].toString().padLeft(2, '0')}:${list[1].toString().padLeft(2, '0')}:${list[2].round().toString().padLeft(2, '0')}";
   }
 }

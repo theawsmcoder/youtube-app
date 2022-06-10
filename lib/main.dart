@@ -5,6 +5,7 @@ import 'package:sample/controllers/chat_connector.dart';
 import 'package:sample/controllers/youtube_connector.dart';
 import 'package:sample/views/chat_widget.dart';
 import 'package:sample/views/youtube_screen.dart';
+import 'package:sample/views/youtube_search_screen.dart';
 
 import './controllers/stopwatch.dart';
 import './views/stopwatch_screen.dart';
@@ -24,13 +25,14 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: MyTheme.darkTheme,
-      home: MultiProvider(providers: [
+      home: /*MultiProvider(providers: [
         ChangeNotifierProvider<YoutubeController>(
             create: (context) => YoutubeController(username: username)),
         ChangeNotifierProvider(
           create: (context) => ChatController(username: username),
         ),
-      ], child: const YoutubeScreen()),
+      ], child: const YoutubeScreen()),*/
+          YoutubeSearchScreen(),
 
       /*
           ChangeNotifierProvider<ChatController>(
