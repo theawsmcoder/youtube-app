@@ -32,30 +32,48 @@ class _YoutubeSearchScreenState extends State<YoutubeSearchScreen> {
         appBar: AppBar(
           title: const Text("Search"),
         ),
-        body: Column(
-          children: [
-            Row(
-              children: [
-                TextField(
-                  controller: searchController,
+        body: SizedBox(
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: searchController,
+                      ),
+                    ),
+                    IconButton(
+                        onPressed: () async {
+                          YoutubeSearchResults temp;
+                          temp = await youtubeDataApiService.search(
+                            searchString: searchController.text,
+                          );
+                          setState(() {
+                            youtubeSearchResults = temp;
+                          });
+                        },
+                        icon: const Icon(Icons.search))
+                  ],
                 ),
-                IconButton(
-                    onPressed: () async {
-                      youtubeSearchResults = await youtubeDataApiService.search(
-                        searchString: searchController.text,
-                      );
-                    },
-                    icon: const Icon(Icons.search))
-              ],
-            ),
-            ListView.builder(
-              itemBuilder: (context, index) {
-                return _ytSearchTile(
-                    youtubeSearchResults.resultDataList![index]);
-              },
-              itemCount: youtubeSearchResults.resultDataList?.length ?? 0,
-            ),
-          ],
+              ),
+              youtubeSearchResults.results.isEmpty
+                  ? const Text("no data")
+                  : SizedBox(
+                      height: 500,
+                      child: ListView.builder(
+                        itemBuilder: (context, index) {
+                          return _ytSearchTile(
+                              youtubeSearchResults.results[index]);
+                        },
+                        itemCount: youtubeSearchResults.results.length,
+                      ),
+                    ),
+            ],
+          ),
         ));
   }
 
@@ -66,8 +84,8 @@ class _YoutubeSearchScreenState extends State<YoutubeSearchScreen> {
               Image.network(result.thumbnailUrl),
               Column(
                 children: [
-                  Text(result.videoTitle),
-                  Text(result.channelName),
+                  Text(result.title),
+                  Text(result.channelTitle),
                   Text(result.videoDescription),
                   Text(result.publishedTime.toString()),
                 ],

@@ -1,29 +1,29 @@
 import 'dart:convert';
 
 class YoutubeSearchResults {
-  String? nextPageToken;
-  String? prevPageToken;
-  List<dynamic>? resultDataList = [];
+  String nextPageToken = '';
+  String prevPageToken = '';
+  List<dynamic> results = [];
 
   YoutubeSearchResults({
-    this.nextPageToken,
-    this.prevPageToken,
-    this.resultDataList,
+    this.nextPageToken = '',
+    this.prevPageToken = '',
+    this.results = const [],
   });
 
   factory YoutubeSearchResults.fromJson(String jsonStr) {
-    Map jsonMap = json.decode(jsonStr.replaceAll("'", "\""));
+    Map jsonMap = json.decode(jsonStr); //.replaceAll("'", "\""));
 
-    String? nextPageToken = jsonMap['nextPageToken'];
-    String? prevPageToken = jsonMap['prevPageToken'];
-    List<dynamic>? results = [];
+    String nextPageToken = jsonMap['nextPageToken'] ?? '';
+    String prevPageToken = jsonMap['prevPageToken'] ?? '';
+    List<dynamic> results = [];
 
     for (var result in jsonMap['items']) {
-      if (result.kind == 'youtube#video') {
+      if (result['id']['kind'] == 'youtube#video') {
         results.add(VideoResult.fromMap(result));
-      } else if (result.kind == 'youtube#channel') {
+      } else if (result['id']['kind'] == 'youtube#channel') {
         results.add(ChannelResult.fromMap(result));
-      } else if (result.kind == 'youtube#playlist') {
+      } else if (result['id']['kind'] == 'youtube#playlist') {
         results.add(PlaylistResult.fromMap(result));
       }
     }
@@ -31,15 +31,15 @@ class YoutubeSearchResults {
     return YoutubeSearchResults(
       nextPageToken: nextPageToken,
       prevPageToken: prevPageToken,
-      resultDataList: results,
+      results: results,
     );
   }
 }
 
 class VideoResult {
   String kind;
-  String videoId;
-  String videoTitle;
+  String id;
+  String title;
   String videoDescription;
   DateTime publishedTime;
 
@@ -48,18 +48,18 @@ class VideoResult {
   int thumbnailWidth;
 
   String channelId;
-  String channelName;
+  String channelTitle;
 
   VideoResult({
     required this.kind,
-    required this.videoId,
-    required this.videoTitle,
+    required this.id,
+    required this.title,
     required this.videoDescription,
     required this.thumbnailUrl,
     required this.thumbnailHeight,
     required this.thumbnailWidth,
     required this.channelId,
-    required this.channelName,
+    required this.channelTitle,
     required this.publishedTime,
   });
 
@@ -69,7 +69,7 @@ class VideoResult {
     String kind = result['id']['kind'];
     String videoId = result['id']['videoId'];
     String channelId = result['snippet']['channelId'];
-    String channelName = result['snippet']['channelTitle'];
+    String channelTitle = result['snippet']['channelTitle'];
     String videoTitle = result['snippet']['title'];
     DateTime publishedTime = DateTime.parse(result['snippet']['publishedAt']);
     String videoDescription = result['snippet']['description'];
@@ -80,9 +80,9 @@ class VideoResult {
     return VideoResult(
       kind: kind,
       channelId: channelId,
-      channelName: channelName,
-      videoId: videoId,
-      videoTitle: videoTitle,
+      channelTitle: channelTitle,
+      id: videoId,
+      title: videoTitle,
       videoDescription: videoDescription,
       thumbnailUrl: thumbnailUrl,
       publishedTime: publishedTime,
@@ -97,15 +97,15 @@ class ChannelResult {
   String description;
   DateTime publishedTime;
   String thumbnailUrl;
-  String channelId;
-  String channelName;
+  String id;
+  String title;
 
   ChannelResult({
     required this.kind,
     required this.description,
     required this.thumbnailUrl,
-    required this.channelId,
-    required this.channelName,
+    required this.id,
+    required this.title,
     required this.publishedTime,
   });
 
@@ -113,16 +113,16 @@ class ChannelResult {
     //Map jsonMap = json.decode(jsonStr.replaceAll("'", "\""));
 
     String kind = result['id']['kind'];
-    String channelId = result['snippet']['channelId'];
-    String channelName = result['snippet']['channelTitle'];
+    String id = result['snippet']['channelId'];
+    String title = result['snippet']['channelTitle'];
     DateTime publishedTime = DateTime.parse(result['snippet']['publishedAt']);
     String description = result['snippet']['description'];
     String thumbnailUrl = result['snippet']['thumbnails']['medium']['url'];
 
     return ChannelResult(
       kind: kind,
-      channelId: channelId,
-      channelName: channelName,
+      id: id,
+      title: title,
       description: description,
       thumbnailUrl: thumbnailUrl,
       publishedTime: publishedTime,
@@ -132,20 +132,22 @@ class ChannelResult {
 
 class PlaylistResult {
   String kind;
-  String playlistId;
+  String id;
+  String title;
   String description;
   DateTime publishedTime;
   String thumbnailUrl;
   String channelId;
-  String channelName;
+  String channelTitle;
 
   PlaylistResult({
     required this.kind,
-    required this.playlistId,
+    required this.id,
+    required this.title,
     required this.description,
     required this.thumbnailUrl,
     required this.channelId,
-    required this.channelName,
+    required this.channelTitle,
     required this.publishedTime,
   });
 
@@ -153,18 +155,20 @@ class PlaylistResult {
     //Map jsonMap = json.decode(jsonStr.replaceAll("'", "\""));
 
     String kind = result['id']['kind'];
-    String playlistId = result['id']['playlistId'];
+    String id = result['id']['playlistId'];
+    String title = result['snippet']['title'];
     String channelId = result['snippet']['channelId'];
-    String channelName = result['snippet']['channelTitle'];
+    String channelTitle = result['snippet']['channelTitle'];
     DateTime publishedTime = DateTime.parse(result['snippet']['publishedAt']);
     String description = result['snippet']['description'];
     String thumbnailUrl = result['snippet']['thumbnails']['medium']['url'];
 
     return PlaylistResult(
       kind: kind,
-      playlistId: playlistId,
+      id: id,
+      title: title,
       channelId: channelId,
-      channelName: channelName,
+      channelTitle: channelTitle,
       description: description,
       thumbnailUrl: thumbnailUrl,
       publishedTime: publishedTime,
@@ -255,14 +259,14 @@ void main() {
       ]
   }''';
 
-  Map jsonMap = json.decode(jsonStr);
+  /*Map jsonMap = json.decode(jsonStr);
   //print(jsonMap['kind']);
   List items = jsonMap['items'];
   //print(items[0]['snippet']);
   print(items[0]['snippet']['channelId']);
   VideoResult resultData = VideoResult.fromMap(items[0]);
-  print(resultData.channelId);
+  print(resultData.channelId);*/
 
   YoutubeSearchResults ytsr = YoutubeSearchResults.fromJson(jsonStr);
-  print(ytsr.resultDataList![0].channelId);
+  print(ytsr.results[0].id);
 }

@@ -10,7 +10,7 @@ import '../models/channel_model.dart';
 import '../models/playlist_model.dart';
 
 class YoutubeDataApiService {
-  final baseUrl = 'https://youtube.googleapis.com';
+  final baseUrl = 'youtube.googleapis.com';
   String nextPageToken = '';
 
   YoutubeDataApiService._instantiate();
@@ -59,7 +59,7 @@ class YoutubeDataApiService {
   }
 
   Future<Video> getVideo({required String videoId}) async {
-    const String route = '/youtube/v3/video';
+    const String route = '/youtube/v3/videos';
     Map<String, String> parameters = {
       'part': 'snippet,statistics',
       'key': key,
@@ -72,7 +72,7 @@ class YoutubeDataApiService {
   }
 
   Future<Channel> getChannel({required String channelId}) async {
-    const String route = '/youtube/v3/channel';
+    const String route = '/youtube/v3/channels';
     Map<String, String> parameters = {
       'part': 'snippet,statistics',
       'key': key,
@@ -96,4 +96,31 @@ class YoutubeDataApiService {
     var playlist = Playlist.fromJson(response.body);
     return playlist;
   }
+}
+
+void main() async {
+  YoutubeDataApiService instance = YoutubeDataApiService._instantiate();
+  //var results = await instance.search(
+  //searchString: 'valorant', channelId: 'UCNF0LEQ2abMr0PAX3cfkAMg');
+
+  Video video = await instance.getVideo(videoId: '_qRvhoJn2nY');
+  print(video.title);
+  Channel channel =
+      await instance.getChannel(channelId: 'UCNF0LEQ2abMr0PAX3cfkAMg');
+  Playlist playlist = await instance.getPlaylist(
+      playlistId: "PLhDcNtvAa1Itk1lbxGdQDvgrkOo6Cur-z");
+  print(playlist.title);
+  print(playlist.items[1].title);
+
+  /*for (var result in results.results) {
+    if (result is VideoResult) {
+      print("video result:${result.title}");
+      Video video = await instance.getVideo(videoId: result.id);
+      print(video.title);
+    } else if (result is ChannelResult) {
+      print("channel result:${result.title}");
+    } else if (result is PlaylistResult) {
+      print("playlist result:${result.title}");
+    }
+  }*/
 }

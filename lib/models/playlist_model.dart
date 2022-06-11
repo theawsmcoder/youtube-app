@@ -12,7 +12,7 @@ class Playlist {
   });
 
   factory Playlist.fromJson(String jsonStr) {
-    Map jsonMap = json.decode(jsonStr.replaceAll("'", "\""));
+    Map jsonMap = json.decode(jsonStr);
 
     String id = jsonMap['items'][0]['snippet']['playlistId'];
     String title = jsonMap['items'][0]['snippet']['title'];

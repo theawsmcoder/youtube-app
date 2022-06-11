@@ -21,7 +21,7 @@ class Channel {
   });
 
   factory Channel.fromJson(String jsonStr) {
-    Map jsonMap = json.decode(jsonStr.replaceAll("'", "\""));
+    Map jsonMap = json.decode(jsonStr);
 
     String id = jsonMap['items'][0]['id'];
     String title = jsonMap['items'][0]['snippet']['title'];
