@@ -32,7 +32,9 @@ class MyApp extends StatelessWidget {
           create: (context) => ChatController(username: username),
         ),
       ], child: const YoutubeScreen()),*/
-          YoutubeSearchScreen(),
+          Scaffold(
+              appBar: AppBar(title: const Text('Search')),
+              body: YoutubeSearchScreen()),
 
       /*
           ChangeNotifierProvider<ChatController>(

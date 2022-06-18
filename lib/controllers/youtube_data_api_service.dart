@@ -12,6 +12,8 @@ import '../models/playlist_model.dart';
 class YoutubeDataApiService {
   final baseUrl = 'youtube.googleapis.com';
   String nextPageToken = '';
+  String prevPageToken = '';
+  List<dynamic> searchResults = [];
 
   YoutubeDataApiService._instantiate();
 
@@ -38,7 +40,29 @@ class YoutubeDataApiService {
     }
   }
 
-  Future<YoutubeSearchResults> search(
+  List getSearchResults(String jsonStr) {
+    Map jsonMap = json.decode(jsonStr);
+    List<dynamic> results = [];
+
+    for (var result in jsonMap['items']) {
+      if (result['id']['kind'] == 'youtube#video') {
+        if (result['snippet']['liveBroadcastContent'] == 'none') {
+          results.add(VideoResult.fromMap(result));
+        }
+      } else if (result['id']['kind'] == 'youtube#channel') {
+        results.add(ChannelResult.fromMap(result));
+      } else if (result['id']['kind'] == 'youtube#playlist') {
+        results.add(PlaylistResult.fromMap(result));
+      }
+    }
+    nextPageToken = jsonMap['nextPageToken'] ?? '';
+    prevPageToken = jsonMap['prevPageToken'] ?? '';
+    searchResults.addAll(results);
+
+    return results;
+  }
+
+  Future<List> search(
       {required String searchString,
       String? pageToken,
       String? channelId}) async {
@@ -50,11 +74,12 @@ class YoutubeDataApiService {
       'key': key,
       'pageToken': pageToken ?? '',
       'channelId': channelId ?? '',
+      'maxResults': '10',
     };
 
     Response response = await httpRequest(route, parameters);
 
-    var results = YoutubeSearchResults.fromJson(response.body);
+    var results = getSearchResults(response.body);
     return results;
   }
 
@@ -95,6 +120,12 @@ class YoutubeDataApiService {
     Response response = await httpRequest(route, parameters);
     var playlist = Playlist.fromJson(response.body);
     return playlist;
+  }
+
+  void clear() {
+    nextPageToken = '';
+    prevPageToken = '';
+    searchResults = [];
   }
 }
 
