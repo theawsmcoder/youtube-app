@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart';
 
 import '../models/youtube_search_models.dart';
@@ -9,16 +10,72 @@ import '../models/video_model.dart';
 import '../models/channel_model.dart';
 import '../models/playlist_model.dart';
 
-class YoutubeDataApiService {
+class YoutubeDataApiService with ChangeNotifier {
   final baseUrl = 'youtube.googleapis.com';
   String nextPageToken = '';
   String prevPageToken = '';
   List<dynamic> searchResults = [];
+  String lastSearchString = '';
+  int totalResults = 0;
+  bool isLoading = false;
+  Video? video;
+  Channel? channel;
+  Playlist? playlist;
 
   YoutubeDataApiService._instantiate();
 
   static final YoutubeDataApiService instance =
       YoutubeDataApiService._instantiate();
+
+  void updateResultsList(List<dynamic> results) {
+    searchResults.addAll(results);
+    notifyListeners();
+  }
+
+  void updateParameters(String nextPageToken, String prevPageToken,
+      int totalResults, List<dynamic> results) {
+    this.nextPageToken = nextPageToken;
+    this.prevPageToken = prevPageToken;
+    this.totalResults = totalResults;
+    searchResults.addAll(results);
+    isLoading = false;
+    notifyListeners();
+  }
+
+  void updateVideo(Video video) {
+    this.video = video;
+    isLoading = false;
+    notifyListeners();
+  }
+
+  void updateChannel(Channel channel) {
+    this.channel = channel;
+    isLoading = false;
+    notifyListeners();
+  }
+
+  void updatePlaylist(Playlist playlist) {
+    this.playlist = playlist;
+    isLoading = false;
+    notifyListeners();
+  }
+
+  void updateIsLoading(bool status) {
+    isLoading = status;
+    notifyListeners();
+  }
+
+  void clear() {
+    nextPageToken = '';
+    prevPageToken = '';
+    searchResults = [];
+    lastSearchString = '';
+    video = null;
+    channel = null;
+    playlist = null;
+    isLoading = false;
+    notifyListeners();
+  }
 
   Future<Response> httpRequest(
       String route, Map<String, String> parameters) async {
@@ -40,7 +97,7 @@ class YoutubeDataApiService {
     }
   }
 
-  List getSearchResults(String jsonStr) {
+  List<dynamic> getSearchResults(String jsonStr) {
     Map jsonMap = json.decode(jsonStr);
     List<dynamic> results = [];
 
@@ -57,15 +114,18 @@ class YoutubeDataApiService {
     }
     nextPageToken = jsonMap['nextPageToken'] ?? '';
     prevPageToken = jsonMap['prevPageToken'] ?? '';
-    searchResults.addAll(results);
+    totalResults = jsonMap['pageInfo']['totalResults'] ?? 0;
+    updateParameters(nextPageToken, prevPageToken, totalResults, results);
 
     return results;
   }
 
-  Future<List> search(
+  Future<List<dynamic>> search(
       {required String searchString,
       String? pageToken,
       String? channelId}) async {
+    updateIsLoading(true);
+    lastSearchString = searchString;
     const String route = '/youtube/v3/search';
 
     Map<String, String> parameters = {
@@ -74,16 +134,20 @@ class YoutubeDataApiService {
       'key': key,
       'pageToken': pageToken ?? '',
       'channelId': channelId ?? '',
-      'maxResults': '10',
+      'maxResults': '30',
     };
+    //print(searchString);
+    //print(pageToken);
 
     Response response = await httpRequest(route, parameters);
 
     var results = getSearchResults(response.body);
+
     return results;
   }
 
   Future<Video> getVideo({required String videoId}) async {
+    updateIsLoading(true);
     const String route = '/youtube/v3/videos';
     Map<String, String> parameters = {
       'part': 'snippet,statistics',
@@ -93,10 +157,14 @@ class YoutubeDataApiService {
 
     Response response = await httpRequest(route, parameters);
     var video = Video.fromJson(response.body);
+
+    updateVideo(video);
+
     return video;
   }
 
   Future<Channel> getChannel({required String channelId}) async {
+    updateIsLoading(true);
     const String route = '/youtube/v3/channels';
     Map<String, String> parameters = {
       'part': 'snippet,statistics',
@@ -106,10 +174,14 @@ class YoutubeDataApiService {
 
     Response response = await httpRequest(route, parameters);
     var channel = Channel.fromJson(response.body);
+
+    updateChannel(channel);
+
     return channel;
   }
 
   Future<Playlist> getPlaylist({required String playlistId}) async {
+    updateIsLoading(true);
     const String route = '/youtube/v3/playlistItems';
     Map<String, String> parameters = {
       'part': 'snippet',
@@ -119,13 +191,16 @@ class YoutubeDataApiService {
 
     Response response = await httpRequest(route, parameters);
     var playlist = Playlist.fromJson(response.body);
+
+    updatePlaylist(playlist);
+
     return playlist;
   }
 
-  void clear() {
-    nextPageToken = '';
-    prevPageToken = '';
-    searchResults = [];
+  Future<List<dynamic>> loadMoreVideos() async {
+    List<dynamic> results =
+        await search(searchString: lastSearchString, pageToken: nextPageToken);
+    return results;
   }
 }
 

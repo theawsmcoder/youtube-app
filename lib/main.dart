@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sample/controllers/chat_connector.dart';
 import 'package:sample/controllers/youtube_connector.dart';
+import 'package:sample/controllers/youtube_data_api_service.dart';
 import 'package:sample/views/chat_widget.dart';
 import 'package:sample/views/youtube_screen.dart';
 import 'package:sample/views/youtube_search_screen.dart';
@@ -32,15 +33,17 @@ class MyApp extends StatelessWidget {
           create: (context) => ChatController(username: username),
         ),
       ], child: const YoutubeScreen()),*/
-          Scaffold(
+          /*Scaffold(
               appBar: AppBar(title: const Text('Search')),
-              body: YoutubeSearchScreen()),
+              body: YoutubeSearchScreen()),*/
 
-      /*
-          ChangeNotifierProvider<ChatController>(
-        create: (context) => ChatController(username: "Alice"),
-        child: ChatWidget(),
-      ),*/
+          ChangeNotifierProvider<YoutubeDataApiService>(
+        create: (context) => YoutubeDataApiService.instance,
+        child: Scaffold(
+          appBar: AppBar(title: const Text('Search')),
+          body: const YoutubeSearchScreen(),
+        ),
+      ),
 
       /*home: ChangeNotifierProvider<Counter>(
         create: (context) => Counter(),
