@@ -15,11 +15,19 @@ class YoutubeController with ChangeNotifier {
   bool remoteEvent = false;
   bool isConnected = false;
   late Command1 command;
-  late Function? func;
+  Function? func;
   PlayerInfo playerInfo = PlayerInfo(
-      title: 'not-ready', currentTime: 0.0, duration: 0.0, playerState: 0);
+    title: 'not-ready',
+    currentTime: 0.0,
+    duration: 0.0,
+    playerState: 0,
+  );
 
-  YoutubeController({required String username}) {
+  static final YoutubeController instance = YoutubeController._instantiate();
+
+  YoutubeController._instantiate();
+
+  void setUsername({required String username}) {
     Commands.username = username;
   }
 
@@ -39,6 +47,7 @@ class YoutubeController with ChangeNotifier {
     Timer(Duration(milliseconds: delay), () {
       func!("playVideo()");
     });
+    print("playing");
     notifyListeners();
   }
 
@@ -66,6 +75,16 @@ class YoutubeController with ChangeNotifier {
       conn.send(Commands.stop().toString());
     }
     // a function to stop
+    func!("stopVideo()");
+    notifyListeners();
+  }
+
+  void loadVideo(String videoId) {
+    start = false;
+    if (!remoteEvent && isConnected) {
+      conn.send(Commands.loadVideo(videoId).toString());
+    }
+    func!("loadVideo('$videoId')");
     notifyListeners();
   }
 
@@ -102,8 +121,10 @@ class YoutubeController with ChangeNotifier {
   }
 
   void updatePlayerInfo(PlayerInfo pi) {
+    if (pi.duration == 0.0) {
+      pi.duration = 999;
+    }
     playerInfo = pi;
-    print(pi);
     notifyListeners();
   }
 
@@ -128,6 +149,7 @@ class YoutubeController with ChangeNotifier {
       command = Command1.fromJson(json);
       if (command.func == "start") {
         var delay = double.parse(command.args!) - ping / 2;
+        delay = delay > 0 ? delay : 0;
         if (!start) {
           playVideo(delay.toInt());
         }
@@ -138,6 +160,9 @@ class YoutubeController with ChangeNotifier {
         seekTo(pauseAt);
       } else if (command.func == "stop") {
         stopVideo();
+      } else if (command.func == "loadVideo") {
+        var videoId = command.args!;
+        loadVideo(videoId);
       } else if (command.func == "ping") {
         Commands.ping =
             DateTime.now().difference(command.timestamp).inMilliseconds;

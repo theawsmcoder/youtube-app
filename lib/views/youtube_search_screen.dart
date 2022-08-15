@@ -19,7 +19,7 @@ class YoutubeSearchScreen extends StatefulWidget {
 
 class _YoutubeSearchScreenState extends State<YoutubeSearchScreen> {
   late TextEditingController searchController;
-  YoutubeDataApiService? youtubeDataApiService;
+  //YoutubeDataApiService? youtubeDataApiService;
 
   @override
   void initState() {
@@ -29,8 +29,8 @@ class _YoutubeSearchScreenState extends State<YoutubeSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    youtubeDataApiService ??=
-        Provider.of<YoutubeDataApiService>(context, listen: false);
+    //youtubeDataApiService ??=
+    //Provider.of<YoutubeDataApiService>(context, listen: false);
 
     return Center(
       child: TextButton(

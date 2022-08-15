@@ -72,33 +72,42 @@ class SearchWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    youtubeDataApiService = Provider.of<YoutubeDataApiService>(context);
-
+    //youtubeDataApiService = Provider.of<YoutubeDataApiService>(context);
     return DraggableScrollableSheet(
-      initialChildSize: 0.7,
-      maxChildSize: 0.9,
+      initialChildSize: 1,
+      maxChildSize: 1,
       minChildSize: 0.5,
-      builder: (_, controller) => Container(
-        decoration: const BoxDecoration(color: Color.fromARGB(255, 47, 47, 47)),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              _searchBar,
-              youtubeDataApiService.searchResults.isEmpty &&
-                      youtubeDataApiService.isLoading
-                  ? const Padding(
-                      padding: EdgeInsets.fromLTRB(0, 40, 0, 0),
-                      child: Center(child: CircularProgressIndicator()),
-                    )
-                  : youtubeDataApiService.searchResults.isEmpty &&
-                          !youtubeDataApiService.isLoading
-                      ? const Text("no data")
-                      : _buildListView(context, controller)
-            ],
+      builder: (_, controller) => Column(children: [
+        const Expanded(
+          flex: 1,
+          child: SizedBox.expand(),
+        ),
+        Expanded(
+          flex: 2,
+          child: Container(
+            decoration:
+                const BoxDecoration(color: Color.fromARGB(255, 47, 47, 47)),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  _searchBar,
+                  youtubeDataApiService.searchResults.isEmpty &&
+                          youtubeDataApiService.isLoading
+                      ? const Padding(
+                          padding: EdgeInsets.fromLTRB(0, 40, 0, 0),
+                          child: Center(child: CircularProgressIndicator()),
+                        )
+                      : youtubeDataApiService.searchResults.isEmpty &&
+                              !youtubeDataApiService.isLoading
+                          ? const Text("no data")
+                          : _buildListView(context, controller)
+                ],
+              ),
+            ),
           ),
         ),
-      ),
+      ]),
     );
   }
 }

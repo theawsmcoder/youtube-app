@@ -14,6 +14,9 @@ import './counter.dart';
 import './views/youtube_webview_test.dart';
 import 'theme_data.dart';
 
+var chatController = ChatController.instance;
+var youtubeController = YoutubeController.instance;
+
 void main() {
   runApp(MyApp());
 }
@@ -22,28 +25,70 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    var username = "Alice";
+    var username = "Bob";
     return MaterialApp(
       title: 'Flutter Demo',
       theme: MyTheme.darkTheme,
-      home: /*MultiProvider(providers: [
-        ChangeNotifierProvider<YoutubeController>(
-            create: (context) => YoutubeController(username: username)),
-        ChangeNotifierProvider(
-          create: (context) => ChatController(username: username),
-        ),
-      ], child: const YoutubeScreen()),*/
-          /*Scaffold(
+      home: MultiProvider(
+          providers: [
+            ChangeNotifierProvider<YoutubeController>(
+              create: (context) {
+                //var instance = YoutubeController.instance;
+                youtubeController.setUsername(username: username);
+                return youtubeController;
+              },
+            ),
+            ChangeNotifierProvider<ChatController>(
+              create: (context) {
+                //var instance = ChatController.instance;
+                chatController.setUsername(username: username);
+                return chatController;
+              },
+            ),
+            ChangeNotifierProvider<YoutubeDataApiService>(
+              create: (context) => YoutubeDataApiService.instance,
+            ),
+          ],
+          child: Scaffold(
+              appBar: AppBar(
+                title: const Text(
+                  "youtube",
+                  textAlign: TextAlign.center,
+                ),
+                actions: [
+                  //IconButton(onPressed: () {}, icon: const Icon(Icons.abc)),
+                  Consumer<ChatController>(
+                    builder: (context, value, child) => ElevatedButton(
+                      onPressed: youtubeController.isConnected &&
+                              chatController.isConnected
+                          ? () {
+                              youtubeController.disconnect();
+                              chatController.disconnect();
+                            }
+                          : () {
+                              youtubeController.connectAndListen();
+                              chatController.connectAndListen();
+                            },
+                      child: youtubeController.isConnected &&
+                              chatController.isConnected
+                          ? const Text("dis")
+                          : const Text("con"),
+                    ),
+                  ),
+                ],
+              ),
+              body: const YoutubeScreen())),
+      /*Scaffold(
               appBar: AppBar(title: const Text('Search')),
               body: YoutubeSearchScreen()),*/
 
-          ChangeNotifierProvider<YoutubeDataApiService>(
+      /*ChangeNotifierProvider<YoutubeDataApiService>(
         create: (context) => YoutubeDataApiService.instance,
         child: Scaffold(
           appBar: AppBar(title: const Text('Search')),
           body: const YoutubeSearchScreen(),
         ),
-      ),
+      ),*/
 
       /*home: ChangeNotifierProvider<Counter>(
         create: (context) => Counter(),

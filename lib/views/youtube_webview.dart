@@ -10,19 +10,25 @@ class YoutubeWebview extends StatelessWidget {
   bool playerReady = false;
   final Completer<WebViewController> _completer =
       Completer<WebViewController>();
-  late YoutubeController youtubeController;
 
-  YoutubeWebview({required this.youtubeController});
+  YoutubeController youtubeController = YoutubeController.instance;
+
+  //late YoutubeController youtubeController;
+
+  //YoutubeWebview({required this.youtubeController});
 
   @override
   Widget build(BuildContext context) {
+    if (youtubeController.func == null) {
+      youtubeController.setFunction(callJavascriptMethod);
+    }
     //print(MediaQuery.of(context).size.width);
     return Container(
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.width * 9 / 16 - 1,
       child: WebView(
         javascriptMode: JavascriptMode.unrestricted,
-        initialUrl: "about:blank",
+        initialUrl: "https://www.youtube.com", //"about:blank",
         allowsInlineMediaPlayback: true,
         initialMediaPlaybackPolicy: AutoMediaPlaybackPolicy.always_allow,
         onWebViewCreated: (webViewController) {
@@ -138,6 +144,11 @@ class YoutubeWebview extends StatelessWidget {
 	          player.seekTo(seconds, true);
 	          player.pauseVideo();
 	        }
+
+          function loadVideo(videoId){
+            player.loadVideoById(videoId, 0);
+            player.pauseVideo();
+          }
 
           function getTitle(){
             var title = player.getVideoData()['title'];

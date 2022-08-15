@@ -18,8 +18,24 @@ class _PlayerLayoutState extends State<PlayerLayout> {
 
   @override
   Widget build(BuildContext context) {
-    youtubeController = Provider.of<YoutubeController>(context, listen: false);
+    youtubeController = Provider.of<YoutubeController>(context);
     //tempValue = youtubeController.playerInfo.currentTime;
+    print(youtubeController.playerInfo.duration);
+    print(tempValue);
+    print(youtubeController.playerInfo.playerState);
+
+    /*if (youtubeController.playerInfo.playerState == -1 ||
+        youtubeController.playerInfo.playerState == 0 ||
+        youtubeController.playerInfo.playerState == 5) {
+      tempValue = 0;
+      sliderPause();
+    } else if (youtubeController.playerInfo.playerState == 1 ||
+        youtubeController.playerInfo.playerState == 3) {
+      sliderPause();
+    } else if (youtubeController.playerInfo.playerState == 2) {
+      //tempValue = youtubeController.playerInfo.currentTime;
+      sliderStart();
+    }*/
 
     return GestureDetector(
       onTap: () {
@@ -27,151 +43,158 @@ class _PlayerLayoutState extends State<PlayerLayout> {
           layoutVisible = !layoutVisible;
         });
       },
-      child: Consumer<YoutubeController>(
-        builder: (context, value, child) => Container(
-          height: MediaQuery.of(context).size.width * 9 / 16,
-          color: Colors.transparent,
-          child: layoutVisible
-              ? Container(
-                  color: Colors.black12,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        width: double.infinity,
-                        height: 25,
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(5, 2, 0, 2),
+      child: Container(
+        height: MediaQuery.of(context).size.width * 9 / 16,
+        color: Colors.transparent,
+        child: layoutVisible
+            ? Container(
+                color: Colors.black12,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      height: 25,
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(5, 2, 0, 2),
+                        child: Text(
+                          youtubeController.playerInfo.title,
+                          style: const TextStyle(
+                              fontSize: 16, color: Colors.white),
+                        ),
+                      ),
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.black38,
+                            Colors.black12,
+                          ],
+                        ),
+                      ),
+                    ),
+                    Center(
+                      child: IconButton(
+                        onPressed: () {
+                          switch (youtubeController.playerInfo.playerState) {
+                            //unstarted
+                            case -1:
+                              var delay = (youtubeController.ping / 2 +
+                                      youtubeController.max_ping / 2)
+                                  .toInt();
+                              youtubeController.playVideo(delay);
+
+                              sliderStart();
+                              break;
+
+                            //ended
+                            // for now im using same code as play here
+                            case 0:
+                              var delay = (youtubeController.ping / 2 +
+                                      youtubeController.max_ping / 2)
+                                  .toInt();
+                              youtubeController.playVideo(delay);
+
+                              sliderStart();
+                              break;
+
+                            //pause
+                            case 1:
+                              youtubeController.seekTo(tempValue);
+                              sliderPause();
+                              break;
+
+                            //play
+                            case 2:
+                              var delay = (youtubeController.ping / 2 +
+                                      youtubeController.max_ping / 2)
+                                  .toInt();
+                              youtubeController.playVideo(delay);
+
+                              sliderStart();
+                              break;
+
+                            //buffering
+                            // for now im using same code as pause here
+                            case 3:
+                              youtubeController.seekTo(tempValue);
+                              sliderPause();
+                              break;
+
+                            //cued
+                            // same code as play
+                            case 5:
+                              var delay = (youtubeController.ping / 2 +
+                                      youtubeController.max_ping / 2)
+                                  .toInt();
+                              youtubeController.playVideo(delay);
+
+                              sliderStart();
+                              break;
+                          }
+                        },
+                        icon: Icon(
+                          (getIcon(youtubeController.playerInfo.playerState!)),
+                          size: 30,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(2.0),
                           child: Text(
-                            youtubeController.playerInfo.title,
-                            style: const TextStyle(
-                                fontSize: 16, color: Colors.white),
+                            timeFormat(tempValue.round()),
+                            style: const TextStyle(color: Colors.white),
                           ),
                         ),
-                        decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.black38,
-                              Colors.black12,
-                            ],
-                          ),
-                        ),
-                      ),
-                      Center(
-                        child: IconButton(
-                          onPressed: () {
-                            switch (youtubeController.playerInfo.playerState) {
-                              //ended
-                              // for now im using same code as play here
-                              case 0:
-                                var delay = (youtubeController.ping / 2 +
-                                        youtubeController.ping / 2)
-                                    .toInt();
-                                youtubeController.playVideo(delay);
-
-                                sliderStart();
-                                break;
-
-                              //pause
-                              case 1:
-                                youtubeController.seekTo(tempValue);
-                                sliderPause();
-                                break;
-
-                              //play
-                              case 2:
-                                var delay = (youtubeController.ping / 2 +
-                                        youtubeController.ping / 2)
-                                    .toInt();
-                                youtubeController.playVideo(delay);
-
-                                sliderStart();
-                                break;
-
-                              //buffering
-                              // for now im using same code as pause here
-                              case 3:
-                                youtubeController.seekTo(tempValue);
-                                sliderPause();
-                                break;
-
-                              //cued
-                              // same code as play
-                              case 5:
-                                var delay = (youtubeController.ping / 2 +
-                                        youtubeController.ping / 2)
-                                    .toInt();
-                                youtubeController.playVideo(delay);
-
-                                sliderStart();
-                                break;
-                            }
-                          },
-                          icon: Icon(
-                            (getIcon(
-                                youtubeController.playerInfo.playerState!)),
-                            size: 30,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(2.0),
-                            child: Text(
-                              timeFormat(tempValue.round()),
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                          ),
-                          Expanded(
-                            child: SliderTheme(
-                              data: const SliderThemeData(
-                                  activeTrackColor:
-                                      Color.fromARGB(255, 192, 59, 59),
-                                  inactiveTrackColor: Colors.grey,
-                                  trackHeight: 3,
-                                  overlayColor:
-                                      Color.fromARGB(100, 252, 139, 139),
-                                  overlayShape:
-                                      RoundSliderOverlayShape(overlayRadius: 7),
-                                  thumbColor: Color.fromARGB(255, 198, 39, 39),
-                                  thumbShape: RoundSliderThumbShape(
-                                      enabledThumbRadius: 5)),
-                              child: Padding(
-                                padding: const EdgeInsets.all(10.0),
-                                child: Slider(
-                                  max: youtubeController.playerInfo.duration,
-                                  min: 0,
-                                  value: tempValue,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      tempValue = value;
-                                    });
-                                    youtubeController.seekTo(value);
-                                    sliderPause();
-                                  },
-                                ),
+                        Expanded(
+                          child: SliderTheme(
+                            data: const SliderThemeData(
+                                activeTrackColor:
+                                    Color.fromARGB(255, 192, 59, 59),
+                                inactiveTrackColor: Colors.grey,
+                                trackHeight: 3,
+                                overlayColor:
+                                    Color.fromARGB(100, 252, 139, 139),
+                                overlayShape:
+                                    RoundSliderOverlayShape(overlayRadius: 7),
+                                thumbColor: Color.fromARGB(255, 198, 39, 39),
+                                thumbShape: RoundSliderThumbShape(
+                                    enabledThumbRadius: 5)),
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Slider(
+                                max: youtubeController.playerInfo.duration,
+                                min: 0,
+                                value: tempValue,
+                                onChanged: (value) {
+                                  setState(() {
+                                    tempValue = value;
+                                  });
+                                  youtubeController.seekTo(value);
+                                  sliderPause();
+                                },
                               ),
                             ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.all(2.0),
-                            child: Text(
-                              timeFormat(youtubeController.playerInfo.duration
-                                  .round()),
-                              style: const TextStyle(color: Colors.white),
-                            ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(2.0),
+                          child: Text(
+                            timeFormat(
+                                youtubeController.playerInfo.duration.round()),
+                            style: const TextStyle(color: Colors.white),
                           ),
-                        ],
-                      )
-                    ],
-                  ),
-                )
-              : const SizedBox.expand(),
-        ),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              )
+            : const SizedBox.expand(),
       ),
     );
   }
@@ -206,6 +229,8 @@ class _PlayerLayoutState extends State<PlayerLayout> {
 
   IconData getIcon(int playerState) {
     switch (playerState) {
+      case -1:
+        return Icons.play_arrow;
       case 0:
         return Icons.play_arrow;
       case 1:

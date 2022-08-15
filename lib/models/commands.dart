@@ -49,12 +49,12 @@ class Commands {
     );
   }
 
-  static Command1 link(String args) {
+  static Command1 loadVideo(String args) {
     return Command1(
       username: username,
       timestamp: DateTime.now(),
       ping: ping,
-      func: "link",
+      func: "loadVideo",
       args: args,
       max_ping: max_ping,
     );

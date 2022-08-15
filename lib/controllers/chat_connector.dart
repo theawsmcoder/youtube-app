@@ -24,9 +24,15 @@ class ChatController with ChangeNotifier {
       time: DateTime.utc(2000, 7, 20, 20, 12, 02),
     ),
   ];
-  final username;
+  late String username;
 
-  ChatController({required this.username});
+  static final instance = ChatController._instantiate();
+
+  ChatController._instantiate();
+
+  void setUsername({required String username}) {
+    this.username = username;
+  }
 
   void changeConnectedStatus(bool status) {
     isConnected = status;
