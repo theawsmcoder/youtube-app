@@ -7,6 +7,7 @@ import '.././models/chat_message.dart';
 class ChatController with ChangeNotifier {
   late ConnectionManager conn;
   bool isConnected = false;
+
   List<ChatMessage> chats = [
     ChatMessage(
       username: "Alice",
@@ -24,7 +25,9 @@ class ChatController with ChangeNotifier {
       time: DateTime.utc(2000, 7, 20, 20, 12, 02),
     ),
   ];
+
   late String username;
+  late String roomId;
 
   static final instance = ChatController._instantiate();
 
@@ -32,6 +35,10 @@ class ChatController with ChangeNotifier {
 
   void setUsername({required String username}) {
     this.username = username;
+  }
+
+  void setRoomId({required String roomId}) {
+    this.roomId = roomId;
   }
 
   void changeConnectedStatus(bool status) {
@@ -57,7 +64,7 @@ class ChatController with ChangeNotifier {
 
   void connectAndListen() {
     conn = ConnectionManager(
-        uri: "ws://fastapi-backend-test2.herokuapp.com/ws/chat/$username");
+        uri: "ws://fastapi-backend-test1.herokuapp.com/ws/chat/$roomId/$username");
     conn.connect();
     if (conn.isConnected()) {
       changeConnectedStatus(true);

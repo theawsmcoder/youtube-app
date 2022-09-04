@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
+import 'package:sample/controllers/auth_service.dart';
 import 'package:sample/controllers/chat_connector.dart';
 import 'package:sample/controllers/youtube_connector.dart';
 import 'package:sample/controllers/youtube_data_api_service.dart';
 import 'package:sample/views/chat_widget.dart';
+import 'package:sample/views/wrapper.dart';
 import 'package:sample/views/youtube_screen.dart';
 import 'package:sample/views/youtube_search_screen.dart';
 
@@ -29,27 +31,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: MyTheme.darkTheme,
-      home: MultiProvider(
-          providers: [
-            ChangeNotifierProvider<YoutubeController>(
-              create: (context) {
-                //var instance = YoutubeController.instance;
-                youtubeController.setUsername(username: username);
-                return youtubeController;
-              },
-            ),
-            ChangeNotifierProvider<ChatController>(
-              create: (context) {
-                //var instance = ChatController.instance;
-                chatController.setUsername(username: username);
-                return chatController;
-              },
-            ),
-            ChangeNotifierProvider<YoutubeDataApiService>(
-              create: (context) => YoutubeDataApiService.instance,
-            ),
-          ],
-          child: Scaffold(
+      routes: {YoutubeScreen.route: (context) => const YoutubeScreen()},
+      home: ChangeNotifierProvider<AuthService>(
+        create: (context) => AuthService.instance,
+        child: Wrapper(),
+        /*child: Scaffold(
               appBar: AppBar(
                 title: const Text(
                   "youtube",
@@ -77,12 +63,12 @@ class MyApp extends StatelessWidget {
                   ),
                 ],
               ),
-              body: const YoutubeScreen())),
-      /*Scaffold(
+              body: const YoutubeScreen())),*/
+        /*Scaffold(
               appBar: AppBar(title: const Text('Search')),
               body: YoutubeSearchScreen()),*/
 
-      /*ChangeNotifierProvider<YoutubeDataApiService>(
+        /*ChangeNotifierProvider<YoutubeDataApiService>(
         create: (context) => YoutubeDataApiService.instance,
         child: Scaffold(
           appBar: AppBar(title: const Text('Search')),
@@ -90,10 +76,11 @@ class MyApp extends StatelessWidget {
         ),
       ),*/
 
-      /*home: ChangeNotifierProvider<Counter>(
+        /*home: ChangeNotifierProvider<Counter>(
         create: (context) => Counter(),
         child: MyHomePage(title: 'Flutter Demo Home Page'),
       ),*/
+      ),
     );
   }
 }

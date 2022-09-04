@@ -1,11 +1,25 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart';
+import 'package:sample/controllers/chat_connector.dart';
+import 'package:sample/controllers/youtube_connector.dart';
 
-class AuthService {
+class AuthService with ChangeNotifier {
   AuthService._instantiate();
   static final AuthService instance = AuthService._instantiate();
 
-  String baseUrl = '127.0.0.1:8000';
+  String username = '';
+  String token = '';
+  String roomId = '';
+  bool isSignedIn = false;
+  String baseUrl = 'fastapi-backend-test1.herokuapp.com';
+
+  void updateSignInStatus(bool status) {
+    isSignedIn = status;
+    YoutubeController.instance.setUsername(username: username);
+    ChatController.instance.setUsername(username: username);
+    notifyListeners();
+  }
 
   Future<String> httpRequest(String route, String auth_token) async {
     var headers = {'Authorization': auth_token};
@@ -15,7 +29,11 @@ class AuthService {
 
     StreamedResponse response = await request.send();
 
-    return await response.stream.bytesToString();
+    if (response.statusCode == 200) {
+      return await response.stream.bytesToString();
+    } else {
+      throw response.stream.bytesToString();
+    }
   }
 
   Future<String> signUp(String username, password) async {
@@ -27,8 +45,11 @@ class AuthService {
     request.headers.addAll(headers);
 
     StreamedResponse response = await request.send();
-
-    return await response.stream.bytesToString();
+    if (response.statusCode == 200) {
+      return await response.stream.bytesToString();
+    } else {
+      throw response.stream.bytesToString();
+    }
   }
 
   Future<String> signIn(String username, String password) async {
@@ -37,7 +58,20 @@ class AuthService {
     request.fields.addAll({'username': username, 'password': password});
     StreamedResponse response = await request.send();
 
-    return await response.stream.bytesToString();
+    if (response.statusCode == 200) {
+      updateSignInStatus(true);
+      return await response.stream.bytesToString();
+    } else {
+      throw response.stream.bytesToString();
+    }
+  }
+
+  void signOut() {
+    username = '';
+    token = '';
+    YoutubeController.instance.setUsername(username: '');
+    ChatController.instance.setUsername(username: '');
+    updateSignInStatus(false);
   }
 }
 

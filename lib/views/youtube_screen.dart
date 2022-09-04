@@ -13,6 +13,7 @@ import 'search_widget.dart';
 
 class YoutubeScreen extends StatelessWidget {
   const YoutubeScreen({Key? key}) : super(key: key);
+  static String route = '/youtube-screen';
   //late YoutubeController youtubeController;
 
   @override

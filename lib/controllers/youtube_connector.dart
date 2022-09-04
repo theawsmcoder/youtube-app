@@ -16,6 +16,8 @@ class YoutubeController with ChangeNotifier {
   bool isConnected = false;
   late Command1 command;
   Function? func;
+  late String roomId;
+
   PlayerInfo playerInfo = PlayerInfo(
     title: 'not-ready',
     currentTime: 0.0,
@@ -29,6 +31,10 @@ class YoutubeController with ChangeNotifier {
 
   void setUsername({required String username}) {
     Commands.username = username;
+  }
+
+  void setRoomId({required String roomId}) {
+    this.roomId = roomId;
   }
 
   void setFunction(Function func) {
@@ -131,7 +137,7 @@ class YoutubeController with ChangeNotifier {
   void connectAndListen() {
     conn = ConnectionManager(
         uri:
-            "ws://fastapi-backend-test2.herokuapp.com/ws/${Commands.username}");
+            "ws://fastapi-backend-test1.herokuapp.com/ws/commands/$roomId/${Commands.username}");
     conn.connect();
     if (conn.isConnected()) {
       changeConnectedStatus(true);
