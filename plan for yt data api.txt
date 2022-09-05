@@ -1,0 +1,20 @@
+Search:
+	uses search api to get a list of videos, playlist and channels
+
+channel:
+	once tapped on channel, uses channel api to get channel info
+	also loads videos of that channel using search api
+
+videos:
+	uses video api to get video details
+	cues the video to play
+	should also load comments but thats for later
+
+playlist:
+	uses playlist items api
+
+we need following functions:
+	getSearchResults(String searchString)
+	getChannelInfo(String channelId)
+	getVideoInfo(String videoId)
+	getPlaylistItems(String playlistId)

@@ -1,8 +1,23 @@
 import 'package:flutter/material.dart';
+
 import 'package:provider/provider.dart';
+import 'package:sample/controllers/auth_service.dart';
+import 'package:sample/controllers/chat_connector.dart';
+import 'package:sample/controllers/youtube_connector.dart';
+import 'package:sample/controllers/youtube_data_api_service.dart';
+import 'package:sample/views/chat_widget.dart';
+import 'package:sample/views/wrapper.dart';
+import 'package:sample/views/youtube_screen.dart';
+import 'package:sample/views/youtube_search_screen.dart';
+
 import './controllers/stopwatch.dart';
 import './views/stopwatch_screen.dart';
 import './counter.dart';
+import './views/youtube_webview_test.dart';
+import 'theme_data.dart';
+
+var chatController = ChatController.instance;
+var youtubeController = YoutubeController.instance;
 
 void main() {
   runApp(MyApp());
@@ -12,29 +27,60 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    var username = "Bob";
     return MaterialApp(
       title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-      ),
-      home: ChangeNotifierProvider<Stopwatch>(
-        create: (context) => Stopwatch(),
-        child: StopwatchScreen(),
-      ),
+      theme: MyTheme.darkTheme,
+      routes: {YoutubeScreen.route: (context) => const YoutubeScreen()},
+      home: ChangeNotifierProvider<AuthService>(
+        create: (context) => AuthService.instance,
+        child: Wrapper(),
+        /*child: Scaffold(
+              appBar: AppBar(
+                title: const Text(
+                  "youtube",
+                  textAlign: TextAlign.center,
+                ),
+                actions: [
+                  //IconButton(onPressed: () {}, icon: const Icon(Icons.abc)),
+                  Consumer<ChatController>(
+                    builder: (context, value, child) => ElevatedButton(
+                      onPressed: youtubeController.isConnected &&
+                              chatController.isConnected
+                          ? () {
+                              youtubeController.disconnect();
+                              chatController.disconnect();
+                            }
+                          : () {
+                              youtubeController.connectAndListen();
+                              chatController.connectAndListen();
+                            },
+                      child: youtubeController.isConnected &&
+                              chatController.isConnected
+                          ? const Text("dis")
+                          : const Text("con"),
+                    ),
+                  ),
+                ],
+              ),
+              body: const YoutubeScreen())),*/
+        /*Scaffold(
+              appBar: AppBar(title: const Text('Search')),
+              body: YoutubeSearchScreen()),*/
 
-      /*home: ChangeNotifierProvider<Counter>(
+        /*ChangeNotifierProvider<YoutubeDataApiService>(
+        create: (context) => YoutubeDataApiService.instance,
+        child: Scaffold(
+          appBar: AppBar(title: const Text('Search')),
+          body: const YoutubeSearchScreen(),
+        ),
+      ),*/
+
+        /*home: ChangeNotifierProvider<Counter>(
         create: (context) => Counter(),
         child: MyHomePage(title: 'Flutter Demo Home Page'),
       ),*/
+      ),
     );
   }
 }
