@@ -11,6 +11,7 @@ import '../controllers/youtube_data_api_service.dart';
 
 class Wrapper extends StatelessWidget {
   Wrapper({Key? key}) : super(key: key);
+  static const String route = '/';
   final auth = AuthService.instance;
 
   @override
