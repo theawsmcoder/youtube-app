@@ -11,7 +11,7 @@ import 'dart:math';
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({Key? key}) : super(key: key);
-  static String route = '/home-screen';
+  static const String route = '/home-screen';
   final auth = AuthService.instance;
   final random = Random();
   final roomFieldController = TextEditingController();
