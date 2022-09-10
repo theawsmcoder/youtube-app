@@ -69,8 +69,8 @@ class AuthService with ChangeNotifier {
   void signOut() {
     username = '';
     token = '';
-    YoutubeController.instance.setUsername(username: '');
-    ChatController.instance.setUsername(username: '');
+    YoutubeController.instance.disconnect();
+    ChatController.instance.disconnect();
     updateSignInStatus(false);
   }
 }

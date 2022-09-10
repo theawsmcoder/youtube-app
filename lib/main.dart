@@ -5,6 +5,7 @@ import 'package:sample/controllers/auth_service.dart';
 import 'package:sample/controllers/chat_connector.dart';
 import 'package:sample/controllers/youtube_connector.dart';
 import 'package:sample/controllers/youtube_data_api_service.dart';
+import 'package:sample/route_generator.dart';
 import 'package:sample/views/chat_widget.dart';
 import 'package:sample/views/wrapper.dart';
 import 'package:sample/views/youtube_screen.dart';
@@ -28,13 +29,27 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var username = "Bob";
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: MyTheme.darkTheme,
-      routes: {YoutubeScreen.route: (context) => const YoutubeScreen()},
-      home: ChangeNotifierProvider<AuthService>(
-        create: (context) => AuthService.instance,
-        child: Wrapper(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<AuthService>(
+          create: (context) => AuthService.instance,
+        ),
+        ChangeNotifierProvider<YoutubeController>(
+          create: (context) => YoutubeController.instance,
+        ),
+        ChangeNotifierProvider<ChatController>(
+          create: (context) => ChatController.instance,
+        ),
+        ChangeNotifierProvider<YoutubeDataApiService>(
+          create: (context) => YoutubeDataApiService.instance,
+        ),
+      ],
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        theme: MyTheme.darkTheme,
+        //routes: {YoutubeScreen.route: (context) => YoutubeScreen()},
+        initialRoute: Wrapper.route,
+        onGenerateRoute: RouteGenerator.generateRoute,
         /*child: Scaffold(
               appBar: AppBar(
                 title: const Text(

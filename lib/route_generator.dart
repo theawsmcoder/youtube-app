@@ -8,16 +8,22 @@ import './views/login_and_register_screen.dart';
 import './views/youtube_screen.dart';
 
 import './controllers/auth_service.dart';
+import '../controllers/chat_connector.dart';
+import '../controllers/youtube_connector.dart';
+import '../controllers/youtube_data_api_service.dart';
 
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
     final args = settings.arguments;
 
     switch (settings.name) {
-      case '/':
+      case Wrapper.route:
         return MaterialPageRoute(builder: (_) {
-          return ChangeNotifierProvider<AuthService>(
-              create: (context) => AuthService.instance, child: Wrapper());
+          return /*ChangeNotifierProvider<AuthService>(
+            create: (context) => AuthService.instance,
+            child: */
+              Wrapper();
+          //);
         });
 
       case LoginRegisterScreen.route:
@@ -27,7 +33,7 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (_) => HomeScreen());
 
       case YoutubeScreen.route:
-        return MaterialPageRoute(builder: (_) => const YoutubeScreen());
+        return MaterialPageRoute(builder: (_) => YoutubeScreen());
 
       default:
         return _errorRoute();

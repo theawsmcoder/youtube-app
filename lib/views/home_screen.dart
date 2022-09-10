@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sample/controllers/youtube_data_api_service.dart';
+import '.././controllers/youtube_data_api_service.dart';
 
 import '../controllers/auth_service.dart';
 import '../controllers/chat_connector.dart';
@@ -19,44 +19,32 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-        providers: [
-          ChangeNotifierProvider<YoutubeController>(
-            create: (context) => YoutubeController.instance,
-          ),
-          ChangeNotifierProvider<ChatController>(
-            create: (context) => ChatController.instance,
-          ),
-          ChangeNotifierProvider<YoutubeDataApiService>(
-            create: (context) => YoutubeDataApiService.instance,
-          ),
-        ],
-        child: Scaffold(
-            appBar: AppBar(
-              title: const Text("Home"),
-              actions: [
-                IconButton(
-                    onPressed: () {
-                      auth.signOut();
-                    },
-                    icon: const Icon(Icons.logout))
-              ],
-            ),
-            body: Column(
-              children: [
-                ElevatedButton(
-                    onPressed: () {
-                      setRoomId((random.nextInt(89999) + 10000).toString());
-                      Navigator.of(context).pushNamed(YoutubeScreen.route);
-                    },
-                    child: const Text("Create Room")),
-                ElevatedButton(
-                    onPressed: () async {
-                      await _dialog(context);
-                    },
-                    child: const Text("Join Room"))
-              ],
-            )));
+    return Scaffold(
+        appBar: AppBar(
+          title: const Text("Home"),
+          actions: [
+            IconButton(
+                onPressed: () {
+                  auth.signOut();
+                },
+                icon: const Icon(Icons.logout))
+          ],
+        ),
+        body: Column(
+          children: [
+            ElevatedButton(
+                onPressed: () {
+                  setRoomId((random.nextInt(89999) + 10000).toString());
+                  Navigator.of(context).pushNamed(YoutubeScreen.route);
+                },
+                child: const Text("Create Room")),
+            ElevatedButton(
+                onPressed: () async {
+                  await _dialog(context);
+                },
+                child: const Text("Join Room"))
+          ],
+        ));
   }
 
   Future _dialog(context) => showDialog(
@@ -106,7 +94,11 @@ class HomeScreen extends StatelessWidget {
 
   void setRoomId(String roomId) {
     auth.roomId = roomId;
-    ChatController.instance.setRoomId(roomId: auth.roomId);
-    YoutubeController.instance.setRoomId(roomId: auth.roomId);
+    ChatController.instance
+        .refreshConnection(username: auth.username, roomId: roomId);
+    YoutubeController.instance
+        .refreshConnection(username: auth.username, roomId: roomId);
+    //ChatController.instance.setRoomId(roomId: auth.roomId);
+    //YoutubeController.instance.setRoomId(roomId: auth.roomId);
   }
 }

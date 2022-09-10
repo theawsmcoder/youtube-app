@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sample/main.dart';
 
 import '../controllers/chat_connector.dart';
 import '../models/chat_message.dart';
@@ -55,8 +56,9 @@ class ChatWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ChatController chatController =
-        Provider.of<ChatController>(context, listen: false);
+    //ChatController chatController =
+    //Provider.of<ChatController>(context, listen: false);
+    ChatController chatController = ChatController.instance;
 
     return Consumer<ChatController>(
       builder: (context, value, child) => Padding(

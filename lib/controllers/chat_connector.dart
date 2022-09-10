@@ -33,6 +33,13 @@ class ChatController with ChangeNotifier {
 
   ChatController._instantiate();
 
+  void refreshConnection({required String username, required String roomId}) {
+    disconnect();
+    setRoomId(roomId: roomId);
+    setUsername(username: username);
+    connectAndListen();
+  }
+
   void setUsername({required String username}) {
     this.username = username;
   }
@@ -64,7 +71,8 @@ class ChatController with ChangeNotifier {
 
   void connectAndListen() {
     conn = ConnectionManager(
-        uri: "ws://fastapi-backend-test1.herokuapp.com/ws/chat/$roomId/$username");
+        uri:
+            "ws://fastapi-backend-test1.herokuapp.com/ws/chat/$roomId/$username");
     conn.connect();
     if (conn.isConnected()) {
       changeConnectedStatus(true);
@@ -88,7 +96,11 @@ class ChatController with ChangeNotifier {
   }
 
   void disconnect() {
-    conn.disconnect();
+    if (conn != Null) {
+      conn.disconnect();
+    }
+    setRoomId(roomId: '');
+    setUsername(username: '');
     changeConnectedStatus(false);
   }
 }

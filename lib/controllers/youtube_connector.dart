@@ -29,6 +29,13 @@ class YoutubeController with ChangeNotifier {
 
   YoutubeController._instantiate();
 
+  void refreshConnection({required String username, required String roomId}) {
+    disconnect();
+    setRoomId(roomId: roomId);
+    setUsername(username: username);
+    connectAndListen();
+  }
+
   void setUsername({required String username}) {
     Commands.username = username;
   }
@@ -185,7 +192,11 @@ class YoutubeController with ChangeNotifier {
 
   void disconnect() {
     stopPinging();
-    conn.disconnect();
+    if (conn != Null) {
+      conn.disconnect();
+    }
+    setRoomId(roomId: '');
+    setUsername(username: '');
     changeConnectedStatus(false);
   }
 }
